@@ -14,8 +14,12 @@ function App() {
     const url = window.location.href;
     const urlObj = new URL(url);
     const codeParam = urlObj.searchParams.get('code');
+    const addressParam = urlObj.searchParams.get('address');
     if(codeParam){
       setSecretCode(codeParam);
+    }
+    if(addressParam){
+      setAddress(addressParam);
     }
   }, []);
 
@@ -102,6 +106,7 @@ function App() {
                       onChange={e=>{
                         setAddress(e.target.value)
                       }}
+                      value={address}
                     />
                       <div className="input-icon">
                         <i className="fas fa-wallet"></i>
