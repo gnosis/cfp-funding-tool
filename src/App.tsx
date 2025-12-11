@@ -10,6 +10,17 @@ function App() {
   const [error, setError] = React.useState('');
   const [message, setMessage] = React.useState('');
 
+  React.useEffect(() => {
+    const url = window.location.href;
+    const urlObj = new URL(url);
+    const codeParam = urlObj.searchParams.get('code');
+    console.log('codeParam:', urlObj, codeParam);
+    if(codeParam){
+      console.log('set codeParam:');
+      setSecretCode(codeParam);
+    }
+  }, []);
+
   async function getAirdrop(address: string, secretCode: string) {
     setPending(true);
     setError('');
@@ -117,6 +128,7 @@ function App() {
                       onChange={e=>{
                         setSecretCode(e.target.value)
                       }}
+                      value={secretCode}
                     />
                       <div className="input-icon">
                         <i className="fas fa-key"></i>
