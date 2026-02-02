@@ -55,8 +55,6 @@ jobs:
       build_artifact_name: build-${{ github.sha }}
     secrets:
       PINATA_JWT: ${{ secrets.PINATA_JWT }}
-      # Needed to checkout the private gh-action-pinata repo.
-      PINATA_ACTION_TOKEN: ${{ secrets.PINATA_ACTION_TOKEN }}
 
   post-deploy:
     needs: deploy
