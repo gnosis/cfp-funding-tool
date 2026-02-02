@@ -25,6 +25,24 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "20"
+
+      - name: Install yarn for caching
+        run: |
+          # Install yarn globally via npm (required for setup-node caching)
+          # setup-node requires the package manager to be available before caching
+          if ! command -v yarn >/dev/null 2>&1; then
+            echo "Installing yarn via npm..."
+            npm install -g yarn
+            echo "✅ Yarn installed"
+          else
+            echo "✅ Yarn already available"
+          fi
+          yarn --version
+
+      - name: Setup Node.js cache
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "20"
           cache: yarn
 
       - name: Install dependencies
