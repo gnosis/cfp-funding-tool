@@ -80,9 +80,9 @@ function App() {
         <div className="container">
 
           <section className="hero">
-            <h1>Claim Your wxHOPR and xDai</h1>
+            <h1>Claim Your wxHOPR and xDAI</h1>
             <p className="hero-description">
-              Get your wxHOPR and xDai to test Gnosis VPN.
+              Get your wxHOPR and xDAI to use Gnosis VPN.
               Enter your Gnosis VPN address and secret code to claim your airdrop.
             </p>
           </section>
@@ -150,7 +150,7 @@ function App() {
                   <div className="btn-content">
                     <div className="spinner" id="spinner"></div>
                     <span id="btnText">
-                      <i className="fas fa-gift"></i>
+                      { " " }
                       {pending ? "Claiming..." : "Claim Airdrop"}
                     </span>
                   </div>
@@ -182,39 +182,6 @@ function App() {
         </div>
       </main>
 
-      <footer className="footer">
-        <div className="container">
-          <div className="footer-content">
-            <div className="footer-links">
-              <a href="https://hoprnet.org" target="_blank" rel="noopener noreferrer" className="footer-link">About wxHOPR</a>
-              <a href="https://vpn.gnosis.eth.limo/" target="_blank" rel="noopener noreferrer" className="footer-link">Gnosis VPN</a>
-            </div>
-            {/* <div className="footer-text">
-              <p>&copy; 2024 wxHOPR Airdrop. Powered by Gnosis Chain.</p>
-            </div>
-            <div className="socials">
-                <a href="https://x.com/Gnosis_VPN" target="_blank" rel="noopener noreferrer" aria-label="X" className="block w-6 h-6">
-                  <img alt="X logo" loading="lazy" width="24" height="24" decoding="async" src="/socials/footer_social_x.svg"/>
-                </a>
-                <a href="https://mastodon.social/@GnosisVPN" target="_blank" rel="noopener noreferrer" aria-label="Mastodon" className="block w-6 h-6">
-                  <img alt="Mastodon logo" loading="lazy" width="24" height="24" decoding="async" src="/socials/footer_social_mastodon.svg"/>
-                </a>
-                <a href="https://bsky.app/profile/gnosisvpn.bsky.social" target="_blank" rel="noopener noreferrer" aria-label="Bluesky" className="block w-6 h-6">
-                  <img alt="Bluesky logo" loading="lazy" width="24" height="24" decoding="async" src="/socials/footer_social_bluesky.svg"/>
-                </a>
-                <a href="https://warpcast.com/gnosisvpn" target="_blank" rel="noopener noreferrer" aria-label="Warpcast" className="block w-6 h-6">
-                  <img alt="Warpcast logo" loading="lazy" width="24" height="24" decoding="async" src="/socials/footer_social_warpcast.svg"/>
-                </a>
-                <a href="https://github.com/gnosis/gnosis_vpn-client/" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="block w-6 h-6">
-                  <img alt="GitHub logo" loading="lazy" width="24" height="24" decoding="async" src="/socials/footer_social_github.svg"/>
-                </a>
-                <a href="https://discord.gg/gnosis" target="_blank" rel="noopener noreferrer" aria-label="Discord" className="block w-6 h-6">
-                  <img alt="Discord logo" loading="lazy" width="24" height="24" decoding="async" src="/socials/footer_social_discord.svg"/>
-                </a>
-              </div> */}
-          </div>
-        </div>
-      </footer>
 
     </div>
   )
