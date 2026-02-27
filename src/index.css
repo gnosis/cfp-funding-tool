@@ -327,6 +327,11 @@ body {
     overflow-wrap: anywhere;
 }
 
+.result #resultDetails {
+    font-size: 0.85rem;
+    word-wrap: break-word;
+}
+
 .tx-hash {
     background: rgba(0, 0, 0, 0.05);
     padding: 1rem;
