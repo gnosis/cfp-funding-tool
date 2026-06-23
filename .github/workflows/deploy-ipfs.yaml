@@ -60,121 +60,31 @@ jobs:
           path: dist
           if-no-files-found: error
 
-  deploy:
-    needs: build
-    uses: gnosis/gh-action-pinata/.github/workflows/pinata-deployment.yml@main
-    with:
-      environment: prod
-      project_name: cfp-funding-tool
-      node_version: "20"
-      cache: yarn
-      build_dir: dist
-      use_prebuilt_build: true
-      build_artifact_name: build-${{ github.sha }}
-    secrets:
-      PINATA_JWT: ${{ secrets.PINATA_JWT }}
+  deploy-ipfs:
+      needs: [build]
+      uses: gnosis/gh-action-pinata/.github/workflows/pinata-deployment.yml@6197bbf8ffd6bee0d4ddb633af27633ca80a6a26 # 0.2.0
+      with:
+        environment: prod
+        project_name: cfp-funding-tool
+        build_dir: dist
+        build_artifact_name: build-${{ github.sha }}
+      secrets:
+        PINATA_JWT: ${{ secrets.PINATA_JWT }}
 
-  post-deploy:
-    needs: deploy
+  propose-ens:
+    needs: [build, deploy-ipfs]
+    if: ${{ inputs.propose_ens }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    if: always()
+    environment: prod
+    timeout-minutes: 10
     steps:
-      - name: Run primary health check (Pinata gateway)
-        run: |
-          echo "🏥 Running primary health check for production deployment (Pinata only)..."
-
-          IPFS_HASH="${{ needs.deploy.outputs.ipfs_hash }}"
-          if [ -z "$IPFS_HASH" ] || [ "$IPFS_HASH" = "null" ]; then
-            echo "❌ Could not read ipfs_hash"
-            exit 1
-          fi
-
-          PINATA_URL="https://gateway.pinata.cloud/ipfs/$IPFS_HASH"
-
-          # Wait briefly then try Pinata a few times
-          sleep 5
-          for i in {1..3}; do
-            echo "Checking Pinata gateway (attempt $i): $PINATA_URL"
-            if curl -s --head --max-time 30 "$PINATA_URL" > /dev/null; then
-              echo "✅ Pinata gateway is accessible"
-              exit 0
-            else
-              echo "⚠️ Pinata not accessible yet, retrying..."
-              sleep 15
-            fi
-          done
-
-          echo "❌ Pinata gateway not accessible after retries"
-          exit 1
-
-      - name: Test multi-gateway accessibility (informational)
-        continue-on-error: true
-        run: |
-          echo "🌐 Testing deployment accessibility across gateways..."
-
-          IPFS_HASH="${{ needs.deploy.outputs.ipfs_hash }}"
-
-          # Test multiple gateways
-          GATEWAYS=(
-            "https://gateway.pinata.cloud/ipfs/$IPFS_HASH"
-            "https://ipfs.io/ipfs/$IPFS_HASH"
-            "https://cloudflare-ipfs.com/ipfs/$IPFS_HASH"
-            "https://dweb.link/ipfs/$IPFS_HASH"
-          )
-
-          SUCCESSFUL=0
-          TOTAL=${#GATEWAYS[@]}
-
-          for gateway in "${GATEWAYS[@]}"; do
-            echo "Testing $gateway..."
-            if curl -s --head --max-time 30 "$gateway" > /dev/null; then
-              echo "✅ $gateway - accessible"
-              ((SUCCESSFUL++))
-            else
-              echo "❌ $gateway - not accessible"
-            fi
-          done
-
-          echo "📊 Accessibility: $SUCCESSFUL/$TOTAL gateways"
-          echo "ℹ️ This is informational only; gateways other than Pinata may take minutes to propagate."
-
-      - name: Create production deployment summary
-        run: |
-          IPFS_HASH="${{ needs.deploy.outputs.ipfs_hash }}"
-          PINATA_URL="${{ needs.deploy.outputs.pinata_url }}"
-
-          {
-            echo '# 🚀 Production Deployment Complete'
-            echo ''
-            echo '## 📊 Deployment Details'
-            echo "- **Environment**: Production"
-            echo "- **Branch**: \`${{ github.ref_name }}\`"
-            echo "- **Commit**: \`${{ github.sha }}\`"
-            echo "- **Timestamp**: \`$(date -Iseconds)\`"
-            echo ''
-            echo '## 🌐 Primary Access URLs'
-            echo "- **Pinata Gateway**: [${PINATA_URL}](${PINATA_URL})"
-            echo "- **IPFS Gateway**: [https://ipfs.io/ipfs/${IPFS_HASH}](https://ipfs.io/ipfs/${IPFS_HASH})"
-            echo ''
-            echo '## 🔗 Alternative Gateways'
-            echo "- **Cloudflare IPFS**: [https://cloudflare-ipfs.com/ipfs/${IPFS_HASH}](https://cloudflare-ipfs.com/ipfs/${IPFS_HASH})"
-            echo "- **dweb.link**: [https://dweb.link/ipfs/${IPFS_HASH}](https://dweb.link/ipfs/${IPFS_HASH})"
-            echo ''
-            echo '## 📋 Technical Details'
-            echo "- **IPFS Hash**: \`${IPFS_HASH}\`"
-          } >> $GITHUB_STEP_SUMMARY
-
-      - name: Deployment status
-        if: always()
-        run: |
-          if [ "${{ needs.deploy.result }}" = "success" ]; then
-            echo "✅ Production deployment completed successfully!"
-            echo "🌐 Site is now live on IPFS"
-            echo "📊 Check the Actions summary for all access URLs"
-          else
-            echo "❌ Production deployment failed"
-            echo "📋 Check the logs above for error details"
-            echo "🚨 Production site may be unavailable or outdated"
-            exit 1
-          fi
+      - name: Propose ENS contenthash update
+        uses: hoprnet/hopr-workflows/actions/propose-ens-contenthash@b705e6ea5d876087e98307c76a12b821e38f030e # propose-ens-contenthash
+        with:
+          CID: ${{ needs.deploy-ipfs.outputs.ipfs_hash }}
+          ENS_NAME: ${{ vars.ENS_NAME }}
+          RESOLVER_ADDRESS: ${{ vars.RESOLVER_ADDRESS }}
+          SAFE_ADDRESS: ${{ vars.SAFE_ADDRESS }}
+          ENS_DELEGATE_PRIVATE_KEY: ${{ secrets.ENS_DELEGATE_PRIVATE_KEY }}
+          SAFE_API_KEY: ${{ secrets.SAFE_API_KEY }}
+          TX_ORIGIN: 'gnosis_vpn-docs/deploy' 
