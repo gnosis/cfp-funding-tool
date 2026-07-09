@@ -1,3 +1,7 @@
+> [!IMPORTANT]
+> This repository is archived and read-only. The site now lives in the Gnosis VPN website monorepo:
+> **https://github.com/gnosis/gnosis_vpn-website_monorepo/tree/main/apps/funding-tool**
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
